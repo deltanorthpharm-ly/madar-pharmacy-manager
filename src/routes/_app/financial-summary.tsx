@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Placeholder } from "./pos";
+import { Placeholder } from "@/components/placeholder";
 export const Route = createFileRoute("/_app/financial-summary")({
   component: () => <Placeholder title="الملخص المالي" round="الجولة 8" />,
 });
