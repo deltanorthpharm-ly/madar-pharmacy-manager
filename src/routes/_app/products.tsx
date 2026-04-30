@@ -261,6 +261,10 @@ function ProductsPage() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={!!batchesProduct} onOpenChange={(v) => !v && setBatchesProduct(null)}>
+        {batchesProduct && <BatchesDialog product={batchesProduct} onClose={() => setBatchesProduct(null)} />}
+      </Dialog>
     </div>
   );
 }
