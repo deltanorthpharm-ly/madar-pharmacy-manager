@@ -10,7 +10,7 @@ async function getAuthUser(token: string) {
 }
 
 const PaymentSchema = z.object({
-  method: z.enum(["cash", "card", "transfer", "credit", "other"]),
+  method: z.enum(["cash", "card", "transfer", "edfaali", "mobicash", "mobinab", "yusrpay"]),
   amount: z.number().positive(),
 });
 
