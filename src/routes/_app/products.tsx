@@ -222,6 +222,11 @@ function ProductsPage() {
                         {isAdmin && (
                           <TableCell className="text-end">
                             <div className="flex justify-end gap-1">
+                              {p.has_expiry && (
+                                <Button size="icon" variant="ghost" title="الباتشات" onClick={() => setBatchesProduct(p)}>
+                                  <Layers className="h-4 w-4" />
+                                </Button>
+                              )}
                               <Button size="icon" variant="ghost" onClick={() => { setEditing(p); setOpen(true); }}>
                                 <Pencil className="h-4 w-4" />
                               </Button>
