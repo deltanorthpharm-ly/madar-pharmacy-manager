@@ -52,6 +52,7 @@ function ProductsPage() {
   const [editing, setEditing] = useState<Product | null>(null);
   const [open, setOpen] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
+  const [batchesProduct, setBatchesProduct] = useState<Product | null>(null);
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["products"],
