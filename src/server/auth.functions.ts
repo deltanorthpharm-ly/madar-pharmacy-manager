@@ -65,10 +65,21 @@ export const listCashiers = createServerFn({ method: "POST" })
     await assertAdmin(data.token);
     const { data: roles, error } = await supabaseAdmin
       .from("user_roles")
-      .select("user_id, profiles!inner(id, full_name, is_active)")
+      .select("user_id")
       .eq("role", "cashier");
     if (error) throw new Error(error.message);
-    return { cashiers: roles ?? [] };
+    const ids = (roles ?? []).map((r) => r.user_id);
+    if (ids.length === 0) return { cashiers: [] };
+    const { data: profs, error: pErr } = await supabaseAdmin
+      .from("profiles")
+      .select("id, full_name, is_active")
+      .in("id", ids);
+    if (pErr) throw new Error(pErr.message);
+    const cashiers = (profs ?? []).map((p) => ({
+      user_id: p.id,
+      profiles: { id: p.id, full_name: p.full_name, is_active: p.is_active },
+    }));
+    return { cashiers };
   });
 
 // Public: list cashier names+ids for the PIN login screen (just name + id, no email leak)
