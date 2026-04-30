@@ -452,3 +452,131 @@ function CategoriesDialog({ onClose }: { onClose: () => void }) {
     </DialogContent>
   );
 }
+
+type Batch = {
+  id: string; product_id: string; batch_number: string | null;
+  expiry_date: string | null; quantity: number; cost_price: number;
+};
+
+function BatchesDialog({ product, onClose }: { product: Product; onClose: () => void }) {
+  const qc = useQueryClient();
+  const [batchNumber, setBatchNumber] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [qty, setQty] = useState("");
+  const [cost, setCost] = useState(String(product.purchase_price ?? 0));
+  const [busy, setBusy] = useState(false);
+
+  const { data: batches, isLoading } = useQuery({
+    queryKey: ["batches", product.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_batches").select("*").eq("product_id", product.id)
+        .order("expiry_date", { ascending: true, nullsFirst: false });
+      if (error) throw error;
+      return data as Batch[];
+    },
+  });
+
+  const add = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    const quantity = Number(qty) || 0;
+    const { data: batch, error } = await supabase.from("product_batches").insert({
+      product_id: product.id,
+      batch_number: batchNumber.trim() || null,
+      expiry_date: expiry || null,
+      quantity: 0,
+      cost_price: Number(cost) || 0,
+    }).select().single();
+    if (error || !batch) { setBusy(false); toast.error(error?.message ?? "خطأ"); return; }
+    if (quantity > 0) {
+      const { error: smErr } = await supabase.from("stock_movements").insert({
+        product_id: product.id,
+        batch_id: batch.id,
+        type: "purchase",
+        quantity,
+        notes: `إضافة باتش يدوي${batchNumber ? " #" + batchNumber : ""}`,
+      });
+      if (smErr) { setBusy(false); toast.error(smErr.message); return; }
+    }
+    setBusy(false);
+    setBatchNumber(""); setExpiry(""); setQty("");
+    qc.invalidateQueries({ queryKey: ["batches", product.id] });
+    qc.invalidateQueries({ queryKey: ["products"] });
+    toast.success("تم إضافة الباتش");
+  };
+
+  const remove = async (id: string) => {
+    const { error } = await supabase.from("product_batches").delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else { qc.invalidateQueries({ queryKey: ["batches", product.id] }); toast.success("تم الحذف"); }
+  };
+
+  return (
+    <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>باتشات: {product.name}</DialogTitle>
+        <DialogDescription>إدارة الباتشات وتواريخ الصلاحية. الكميات تتحدّث تلقائياً عبر حركات المخزون.</DialogDescription>
+      </DialogHeader>
+
+      <form onSubmit={add} className="grid grid-cols-2 sm:grid-cols-5 gap-2 items-end p-3 rounded-lg border bg-muted/30">
+        <div className="space-y-1">
+          <Label className="text-xs">رقم الباتش</Label>
+          <Input value={batchNumber} onChange={(e) => setBatchNumber(e.target.value)} className="h-9" />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">تاريخ الصلاحية</Label>
+          <Input type="date" value={expiry} onChange={(e) => setExpiry(e.target.value)} className="h-9" />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">الكمية</Label>
+          <Input type="number" min="0" value={qty} onChange={(e) => setQty(e.target.value)} className="h-9" />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">سعر الشراء</Label>
+          <Input type="number" min="0" step="0.01" value={cost} onChange={(e) => setCost(e.target.value)} className="h-9" />
+        </div>
+        <Button type="submit" disabled={busy} className="h-9">
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+        </Button>
+      </form>
+
+      {isLoading ? (
+        <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
+      ) : batches && batches.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-6">لا توجد باتشات</p>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>الرقم</TableHead>
+              <TableHead>الصلاحية</TableHead>
+              <TableHead className="text-end">الكمية</TableHead>
+              <TableHead className="text-end">السعر</TableHead>
+              <TableHead className="text-end">إجراءات</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {batches?.map((b) => (
+              <TableRow key={b.id}>
+                <TableCell className="font-mono text-xs">{b.batch_number ?? "—"}</TableCell>
+                <TableCell className="text-xs">{b.expiry_date ?? "—"}</TableCell>
+                <TableCell className="text-end">{b.quantity}</TableCell>
+                <TableCell className="text-end font-mono">{b.cost_price.toFixed(2)}</TableCell>
+                <TableCell className="text-end">
+                  <Button size="icon" variant="ghost" className="text-destructive" onClick={() => remove(b.id)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+
+      <DialogFooter>
+        <Button variant="outline" onClick={onClose}>إغلاق</Button>
+      </DialogFooter>
+    </DialogContent>
+  );
+}
