@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InvoiceSaleIdRouteImport } from './routes/invoice.$saleId'
 import { Route as AppSuppliersRouteImport } from './routes/_app/suppliers'
 import { Route as AppStockMovementsRouteImport } from './routes/_app/stock-movements'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
@@ -41,6 +42,11 @@ const AppRoute = AppRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvoiceSaleIdRoute = InvoiceSaleIdRouteImport.update({
+  id: '/invoice/$saleId',
+  path: '/invoice/$saleId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppSuppliersRoute = AppSuppliersRouteImport.update({
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRoute
   '/stock-movements': typeof AppStockMovementsRoute
   '/suppliers': typeof AppSuppliersRoute
+  '/invoice/$saleId': typeof InvoiceSaleIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/stock-movements': typeof AppStockMovementsRoute
   '/suppliers': typeof AppSuppliersRoute
+  '/invoice/$saleId': typeof InvoiceSaleIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/_app/stock-movements': typeof AppStockMovementsRoute
   '/_app/suppliers': typeof AppSuppliersRoute
+  '/invoice/$saleId': typeof InvoiceSaleIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/stock-movements'
     | '/suppliers'
+    | '/invoice/$saleId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/stock-movements'
     | '/suppliers'
+    | '/invoice/$saleId'
   id:
     | '__root__'
     | '/'
@@ -248,12 +259,14 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/stock-movements'
     | '/_app/suppliers'
+    | '/invoice/$saleId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
+  InvoiceSaleIdRoute: typeof InvoiceSaleIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -277,6 +290,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invoice/$saleId': {
+      id: '/invoice/$saleId'
+      path: '/invoice/$saleId'
+      fullPath: '/invoice/$saleId'
+      preLoaderRoute: typeof InvoiceSaleIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/suppliers': {
@@ -438,7 +458,17 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
+  InvoiceSaleIdRoute: InvoiceSaleIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
