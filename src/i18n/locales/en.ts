@@ -19,6 +19,7 @@ export const en = {
     financialSummary: "Financial Summary",
     editLog: "Edit Log",
     rebuild: "System Rebuild",
+    withdrawals: "Partner Withdrawals",
     settings: "Settings",
     logout: "Logout",
   },
