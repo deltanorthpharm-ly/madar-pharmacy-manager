@@ -19,6 +19,7 @@ export const ar = {
     financialSummary: "الملخص المالي",
     editLog: "سجل التعديلات",
     rebuild: "إصلاح النظام",
+    withdrawals: "سحوبات الشركاء",
     settings: "الإعدادات",
     logout: "تسجيل الخروج",
   },

@@ -62,6 +62,7 @@ export function AppSidebar() {
 
   const admin = [
     { to: "/employees", icon: UserCog, label: t("nav.employees") },
+    { to: "/withdrawals", icon: Coins, label: t("nav.withdrawals") },
     { to: "/reports", icon: BarChart3, label: t("nav.reports") },
     { to: "/financial-summary", icon: Coins, label: t("nav.financialSummary") },
     { to: "/edit-log", icon: History, label: t("nav.editLog") },
