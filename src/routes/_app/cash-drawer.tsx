@@ -160,15 +160,13 @@ function CashDrawerPage() {
         })
         .eq("id", openDrawer.id);
       if (error) throw error;
-      // Log diff as cash_transaction if any
-      if (Math.abs(diff) > 0.01) {
-        await supabase.from("cash_transactions").insert({
-          drawer_id: openDrawer.id,
-          type: "adjustment",
-          amount: diff,
-          notes: `فرق إقفال: ${closeNotes || "—"}`,
-        });
-      }
+      // Log closing record (always) — type=closing, amount=actual
+      await supabase.from("cash_transactions").insert({
+        drawer_id: openDrawer.id,
+        type: "closing",
+        amount: actual,
+        notes: `إقفال — متوقع: ${expected.toFixed(2)} | فرق: ${diff.toFixed(2)} | ${closeNotes || ""}`,
+      });
     },
     onSuccess: () => {
       toast.success("تم قفل الخزنة");
