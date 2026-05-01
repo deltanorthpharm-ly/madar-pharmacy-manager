@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InvoiceSaleIdRouteImport } from './routes/invoice.$saleId'
+import { Route as AppWithdrawalsRouteImport } from './routes/_app/withdrawals'
 import { Route as AppSuppliersRouteImport } from './routes/_app/suppliers'
 import { Route as AppStockMovementsRouteImport } from './routes/_app/stock-movements'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
@@ -48,6 +49,11 @@ const InvoiceSaleIdRoute = InvoiceSaleIdRouteImport.update({
   id: '/invoice/$saleId',
   path: '/invoice/$saleId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppWithdrawalsRoute = AppWithdrawalsRouteImport.update({
+  id: '/withdrawals',
+  path: '/withdrawals',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppSuppliersRoute = AppSuppliersRouteImport.update({
   id: '/suppliers',
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRoute
   '/stock-movements': typeof AppStockMovementsRoute
   '/suppliers': typeof AppSuppliersRoute
+  '/withdrawals': typeof AppWithdrawalsRoute
   '/invoice/$saleId': typeof InvoiceSaleIdRoute
 }
 export interface FileRoutesByTo {
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/stock-movements': typeof AppStockMovementsRoute
   '/suppliers': typeof AppSuppliersRoute
+  '/withdrawals': typeof AppWithdrawalsRoute
   '/invoice/$saleId': typeof InvoiceSaleIdRoute
 }
 export interface FileRoutesById {
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/_app/stock-movements': typeof AppStockMovementsRoute
   '/_app/suppliers': typeof AppSuppliersRoute
+  '/_app/withdrawals': typeof AppWithdrawalsRoute
   '/invoice/$saleId': typeof InvoiceSaleIdRoute
 }
 export interface FileRouteTypes {
@@ -216,6 +225,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/stock-movements'
     | '/suppliers'
+    | '/withdrawals'
     | '/invoice/$saleId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/stock-movements'
     | '/suppliers'
+    | '/withdrawals'
     | '/invoice/$saleId'
   id:
     | '__root__'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/stock-movements'
     | '/_app/suppliers'
+    | '/_app/withdrawals'
     | '/invoice/$saleId'
   fileRoutesById: FileRoutesById
 }
@@ -298,6 +310,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/invoice/$saleId'
       preLoaderRoute: typeof InvoiceSaleIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/withdrawals': {
+      id: '/_app/withdrawals'
+      path: '/withdrawals'
+      fullPath: '/withdrawals'
+      preLoaderRoute: typeof AppWithdrawalsRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/suppliers': {
       id: '/_app/suppliers'
@@ -431,6 +450,7 @@ interface AppRouteChildren {
   AppSettingsRoute: typeof AppSettingsRoute
   AppStockMovementsRoute: typeof AppStockMovementsRoute
   AppSuppliersRoute: typeof AppSuppliersRoute
+  AppWithdrawalsRoute: typeof AppWithdrawalsRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -450,6 +470,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppSettingsRoute: AppSettingsRoute,
   AppStockMovementsRoute: AppStockMovementsRoute,
   AppSuppliersRoute: AppSuppliersRoute,
+  AppWithdrawalsRoute: AppWithdrawalsRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
