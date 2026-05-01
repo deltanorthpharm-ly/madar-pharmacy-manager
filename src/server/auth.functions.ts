@@ -30,7 +30,6 @@ export const createCashier = createServerFn({ method: "POST" })
 
     const email = `${data.username.toLowerCase()}@cashier.madar.local`;
 
-    // Create auth user with PIN as password
     const { data: created, error: createErr } = await supabaseAdmin.auth.admin.createUser({
       email,
       password: data.pin,
@@ -43,12 +42,10 @@ export const createCashier = createServerFn({ method: "POST" })
 
     const userId = created.user.id;
 
-    // Update profile with full_name (handle_new_user already inserted row)
     await supabaseAdmin.from("profiles").update({
       full_name: data.fullName,
     }).eq("id", userId);
 
-    // Assign cashier role
     const { error: roleErr } = await supabaseAdmin
       .from("user_roles")
       .insert({ user_id: userId, role: "cashier" });
@@ -82,7 +79,6 @@ export const listCashiers = createServerFn({ method: "POST" })
     return { cashiers };
   });
 
-// Public: list cashier names+ids for the PIN login screen (just name + id, no email leak)
 export const listCashiersPublic = createServerFn({ method: "GET" }).handler(async () => {
   const { data: roles, error } = await supabaseAdmin
     .from("user_roles")
@@ -103,14 +99,12 @@ export const listCashiersPublic = createServerFn({ method: "GET" }).handler(asyn
   };
 });
 
-// Get the email of a cashier by id — needed to call signInWithPassword(PIN) on client
 const GetCashierEmailSchema = z.object({ cashierId: z.string().uuid() });
 export const getCashierEmail = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => GetCashierEmailSchema.parse(input))
   .handler(async ({ data }) => {
     const { data: u, error } = await supabaseAdmin.auth.admin.getUserById(data.cashierId);
     if (error || !u.user) throw new Error("Cashier not found");
-    // Verify it's actually a cashier
     const { data: roleRow } = await supabaseAdmin
       .from("user_roles")
       .select("role")
@@ -121,7 +115,6 @@ export const getCashierEmail = createServerFn({ method: "POST" })
     return { email: u.user.email! };
   });
 
-// First-time admin signup with role assignment
 const SignupAdminSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(72),
@@ -131,7 +124,6 @@ const SignupAdminSchema = z.object({
 export const signupFirstAdmin = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => SignupAdminSchema.parse(input))
   .handler(async ({ data }) => {
-    // Only allow if there are zero admins yet
     const { count } = await supabaseAdmin
       .from("user_roles")
       .select("*", { count: "exact", head: true })
@@ -154,7 +146,6 @@ export const signupFirstAdmin = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-// Check if at least one admin exists
 export const adminExists = createServerFn({ method: "GET" }).handler(async () => {
   const { count } = await supabaseAdmin
     .from("user_roles")
@@ -162,3 +153,44 @@ export const adminExists = createServerFn({ method: "GET" }).handler(async () =>
     .eq("role", "admin");
   return { exists: (count ?? 0) > 0 };
 });
+
+// Toggle cashier active status
+const ToggleCashierSchema = z.object({
+  token: z.string().min(10),
+  cashierId: z.string().uuid(),
+  isActive: z.boolean(),
+});
+export const toggleCashierActive = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => ToggleCashierSchema.parse(input))
+  .handler(async ({ data }) => {
+    await assertAdmin(data.token);
+    const { error } = await supabaseAdmin
+      .from("profiles")
+      .update({ is_active: data.isActive })
+      .eq("id", data.cashierId);
+    if (error) throw new Error(error.message);
+    // also ban/unban auth user
+    if (!data.isActive) {
+      await supabaseAdmin.auth.admin.updateUserById(data.cashierId, { ban_duration: "876000h" });
+    } else {
+      await supabaseAdmin.auth.admin.updateUserById(data.cashierId, { ban_duration: "none" });
+    }
+    return { ok: true };
+  });
+
+// Reset cashier PIN
+const ResetPinSchema = z.object({
+  token: z.string().min(10),
+  cashierId: z.string().uuid(),
+  pin: z.string().regex(/^\d{4,6}$/, "PIN يجب أن يكون 4-6 أرقام"),
+});
+export const resetCashierPin = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => ResetPinSchema.parse(input))
+  .handler(async ({ data }) => {
+    await assertAdmin(data.token);
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(data.cashierId, {
+      password: data.pin,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
