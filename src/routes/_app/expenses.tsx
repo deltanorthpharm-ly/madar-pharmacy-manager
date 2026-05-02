@@ -31,7 +31,9 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Pencil } from "lucide-react";
+import { editExpense, deleteExpense } from "@/server/edits.functions";
+import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/_app/expenses")({
   component: ExpensesPage,
@@ -51,8 +53,12 @@ const CATEGORIES = ["كهرباء", "ماء", "إيجار", "رواتب", "صي�
 
 function ExpensesPage() {
   const qc = useQueryClient();
+  const { role, session } = useAuth();
+  const isAdmin = role === "admin";
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ title: "", amount: "", category: "أخرى", notes: "" });
+  const [editing, setEditing] = useState<Expense | null>(null);
+  const [editForm, setEditForm] = useState({ title: "", amount: "", category: "أخرى", notes: "" });
 
   const { data: expenses = [], isLoading } = useQuery({
     queryKey: ["expenses"],
@@ -127,8 +133,8 @@ function ExpensesPage() {
 
   const delMut = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("expenses").delete().eq("id", id);
-      if (error) throw error;
+      if (!session?.access_token) throw new Error("غير مسجل");
+      await deleteExpense({ data: { token: session.access_token, expense_id: id } });
     },
     onSuccess: () => {
       toast.success("تم الحذف");
@@ -136,6 +142,41 @@ function ExpensesPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const editMut = useMutation({
+    mutationFn: async () => {
+      if (!editing || !session?.access_token) throw new Error("غير مسجل");
+      const amt = parseFloat(editForm.amount);
+      if (!editForm.title.trim()) throw new Error("العنوان مطلوب");
+      if (!amt || amt <= 0) throw new Error("المبلغ غير صالح");
+      await editExpense({
+        data: {
+          token: session.access_token,
+          expense_id: editing.id,
+          title: editForm.title,
+          amount: amt,
+          category: editForm.category || null,
+          notes: editForm.notes || null,
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success("تم التعديل");
+      qc.invalidateQueries({ queryKey: ["expenses"] });
+      setEditing(null);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  function openEdit(e: Expense) {
+    setEditing(e);
+    setEditForm({
+      title: e.title,
+      amount: String(e.amount),
+      category: e.category || "أخرى",
+      notes: e.notes || "",
+    });
+  }
 
   const total = expenses.reduce((s, e) => s + Number(e.amount), 0);
   const today = new Date().toDateString();
@@ -223,9 +264,16 @@ function ExpensesPage() {
                   <TableCell className="font-bold text-destructive">{Number(e.amount).toFixed(2)}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{e.notes || "-"}</TableCell>
                   <TableCell>
-                    <Button size="icon" variant="ghost" onClick={() => {
-                      if (confirm("حذف هذا المصروف؟")) delMut.mutate(e.id);
-                    }}><Trash2 className="h-4 w-4" /></Button>
+                    {isAdmin && (
+                      <div className="flex gap-1">
+                        <Button size="icon" variant="ghost" onClick={() => openEdit(e)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button size="icon" variant="ghost" onClick={() => {
+                          if (confirm("حذف هذا المصروف؟")) delMut.mutate(e.id);
+                        }}><Trash2 className="h-4 w-4" /></Button>
+                      </div>
+                    )}
                   </TableCell>
                 </TableRow>
               ))
@@ -233,6 +281,38 @@ function ExpensesPage() {
           </TableBody>
         </Table>
       </div>
+
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>تعديل المصروف</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>العنوان</Label>
+              <Input value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })} />
+            </div>
+            <div>
+              <Label>المبلغ</Label>
+              <Input type="number" step="0.01" value={editForm.amount} onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })} />
+            </div>
+            <div>
+              <Label>التصنيف</Label>
+              <Select value={editForm.category} onValueChange={(v) => setEditForm({ ...editForm, category: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>ملاحظات</Label>
+              <Textarea value={editForm.notes} onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => editMut.mutate()} disabled={editMut.isPending}>حفظ التعديلات</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
