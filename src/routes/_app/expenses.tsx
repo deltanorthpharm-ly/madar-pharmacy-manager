@@ -281,6 +281,38 @@ function ExpensesPage() {
           </TableBody>
         </Table>
       </div>
+
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>تعديل المصروف</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>العنوان</Label>
+              <Input value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })} />
+            </div>
+            <div>
+              <Label>المبلغ</Label>
+              <Input type="number" step="0.01" value={editForm.amount} onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })} />
+            </div>
+            <div>
+              <Label>التصنيف</Label>
+              <Select value={editForm.category} onValueChange={(v) => setEditForm({ ...editForm, category: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>ملاحظات</Label>
+              <Textarea value={editForm.notes} onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => editMut.mutate()} disabled={editMut.isPending}>حفظ التعديلات</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
