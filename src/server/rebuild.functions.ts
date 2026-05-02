@@ -18,9 +18,10 @@ async function assertAdmin(token: string) {
 }
 
 async function setProgress(id: string, progress: number, partial?: Record<string, unknown>) {
-  const update: Record<string, unknown> = { progress };
+  const update: { progress: number; report?: Record<string, unknown> } = { progress };
   if (partial) update.report = partial;
-  await supabaseAdmin.from("system_rebuilds").update(update).eq("id", id);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await supabaseAdmin.from("system_rebuilds").update(update as any).eq("id", id);
 }
 
 // ---- Inventory rebuild: recompute products.current_stock from stock_movements ----
@@ -269,7 +270,8 @@ export const startRebuild = createServerFn({ method: "POST" })
             status: "completed",
             progress: 100,
             finished_at: new Date().toISOString(),
-            report: report as object,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            report: report as any,
           })
           .eq("id", row.id);
       } catch (e) {
