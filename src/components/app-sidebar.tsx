@@ -18,6 +18,10 @@ import {
   Wrench,
   Settings,
   Pill,
+  FileText,
+  Tags,
+  Database,
+  BookOpen,
 } from "lucide-react";
 import {
   Sidebar,
@@ -44,10 +48,12 @@ export function AppSidebar() {
   const main = [
     { to: "/dashboard", icon: LayoutDashboard, label: t("nav.dashboard") },
     { to: "/pos", icon: ScanBarcode, label: t("nav.pos") },
+    { to: "/sales", icon: FileText, label: "المبيعات" },
   ];
 
   const inventory = [
     { to: "/products", icon: Package, label: t("nav.products") },
+    { to: "/categories", icon: Tags, label: "الأصناف" },
     { to: "/inventory", icon: Boxes, label: t("nav.inventory") },
     { to: "/stock-movements", icon: ArrowLeftRight, label: t("nav.stockMovements") },
   ];
@@ -58,6 +64,7 @@ export function AppSidebar() {
     { to: "/customers", icon: Users, label: t("nav.customers") },
     { to: "/expenses", icon: Receipt, label: t("nav.expenses") },
     { to: "/cash-drawer", icon: Wallet, label: t("nav.cashDrawer") },
+    { to: "/user-guide", icon: BookOpen, label: "دليل المستخدم" },
   ];
 
   const admin = [
@@ -67,6 +74,7 @@ export function AppSidebar() {
     { to: "/financial-summary", icon: Coins, label: t("nav.financialSummary") },
     { to: "/edit-log", icon: History, label: t("nav.editLog") },
     { to: "/rebuild", icon: Wrench, label: t("nav.rebuild") },
+    { to: "/data", icon: Database, label: "البيانات" },
     { to: "/settings", icon: Settings, label: t("nav.settings") },
   ];
 
