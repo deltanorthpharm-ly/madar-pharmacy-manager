@@ -14,9 +14,11 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InvoiceSaleIdRouteImport } from './routes/invoice.$saleId'
 import { Route as AppWithdrawalsRouteImport } from './routes/_app/withdrawals'
+import { Route as AppUserGuideRouteImport } from './routes/_app/user-guide'
 import { Route as AppSuppliersRouteImport } from './routes/_app/suppliers'
 import { Route as AppStockMovementsRouteImport } from './routes/_app/stock-movements'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
+import { Route as AppSalesRouteImport } from './routes/_app/sales'
 import { Route as AppReportsRouteImport } from './routes/_app/reports'
 import { Route as AppRebuildRouteImport } from './routes/_app/rebuild'
 import { Route as AppPurchasesRouteImport } from './routes/_app/purchases'
@@ -27,8 +29,10 @@ import { Route as AppFinancialSummaryRouteImport } from './routes/_app/financial
 import { Route as AppExpensesRouteImport } from './routes/_app/expenses'
 import { Route as AppEmployeesRouteImport } from './routes/_app/employees'
 import { Route as AppEditLogRouteImport } from './routes/_app/edit-log'
+import { Route as AppDataRouteImport } from './routes/_app/data'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCustomersRouteImport } from './routes/_app/customers'
+import { Route as AppCategoriesRouteImport } from './routes/_app/categories'
 import { Route as AppCashDrawerRouteImport } from './routes/_app/cash-drawer'
 
 const LoginRoute = LoginRouteImport.update({
@@ -55,6 +59,11 @@ const AppWithdrawalsRoute = AppWithdrawalsRouteImport.update({
   path: '/withdrawals',
   getParentRoute: () => AppRoute,
 } as any)
+const AppUserGuideRoute = AppUserGuideRouteImport.update({
+  id: '/user-guide',
+  path: '/user-guide',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSuppliersRoute = AppSuppliersRouteImport.update({
   id: '/suppliers',
   path: '/suppliers',
@@ -68,6 +77,11 @@ const AppStockMovementsRoute = AppStockMovementsRouteImport.update({
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalesRoute = AppSalesRouteImport.update({
+  id: '/sales',
+  path: '/sales',
   getParentRoute: () => AppRoute,
 } as any)
 const AppReportsRoute = AppReportsRouteImport.update({
@@ -120,6 +134,11 @@ const AppEditLogRoute = AppEditLogRouteImport.update({
   path: '/edit-log',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDataRoute = AppDataRouteImport.update({
+  id: '/data',
+  path: '/data',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -128,6 +147,11 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
 const AppCustomersRoute = AppCustomersRouteImport.update({
   id: '/customers',
   path: '/customers',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCategoriesRoute = AppCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
   getParentRoute: () => AppRoute,
 } as any)
 const AppCashDrawerRoute = AppCashDrawerRouteImport.update({
@@ -140,8 +164,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/cash-drawer': typeof AppCashDrawerRoute
+  '/categories': typeof AppCategoriesRoute
   '/customers': typeof AppCustomersRoute
   '/dashboard': typeof AppDashboardRoute
+  '/data': typeof AppDataRoute
   '/edit-log': typeof AppEditLogRoute
   '/employees': typeof AppEmployeesRoute
   '/expenses': typeof AppExpensesRoute
@@ -152,9 +178,11 @@ export interface FileRoutesByFullPath {
   '/purchases': typeof AppPurchasesRoute
   '/rebuild': typeof AppRebuildRoute
   '/reports': typeof AppReportsRoute
+  '/sales': typeof AppSalesRoute
   '/settings': typeof AppSettingsRoute
   '/stock-movements': typeof AppStockMovementsRoute
   '/suppliers': typeof AppSuppliersRoute
+  '/user-guide': typeof AppUserGuideRoute
   '/withdrawals': typeof AppWithdrawalsRoute
   '/invoice/$saleId': typeof InvoiceSaleIdRoute
 }
@@ -162,8 +190,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/cash-drawer': typeof AppCashDrawerRoute
+  '/categories': typeof AppCategoriesRoute
   '/customers': typeof AppCustomersRoute
   '/dashboard': typeof AppDashboardRoute
+  '/data': typeof AppDataRoute
   '/edit-log': typeof AppEditLogRoute
   '/employees': typeof AppEmployeesRoute
   '/expenses': typeof AppExpensesRoute
@@ -174,9 +204,11 @@ export interface FileRoutesByTo {
   '/purchases': typeof AppPurchasesRoute
   '/rebuild': typeof AppRebuildRoute
   '/reports': typeof AppReportsRoute
+  '/sales': typeof AppSalesRoute
   '/settings': typeof AppSettingsRoute
   '/stock-movements': typeof AppStockMovementsRoute
   '/suppliers': typeof AppSuppliersRoute
+  '/user-guide': typeof AppUserGuideRoute
   '/withdrawals': typeof AppWithdrawalsRoute
   '/invoice/$saleId': typeof InvoiceSaleIdRoute
 }
@@ -186,8 +218,10 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/_app/cash-drawer': typeof AppCashDrawerRoute
+  '/_app/categories': typeof AppCategoriesRoute
   '/_app/customers': typeof AppCustomersRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/data': typeof AppDataRoute
   '/_app/edit-log': typeof AppEditLogRoute
   '/_app/employees': typeof AppEmployeesRoute
   '/_app/expenses': typeof AppExpensesRoute
@@ -198,9 +232,11 @@ export interface FileRoutesById {
   '/_app/purchases': typeof AppPurchasesRoute
   '/_app/rebuild': typeof AppRebuildRoute
   '/_app/reports': typeof AppReportsRoute
+  '/_app/sales': typeof AppSalesRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/stock-movements': typeof AppStockMovementsRoute
   '/_app/suppliers': typeof AppSuppliersRoute
+  '/_app/user-guide': typeof AppUserGuideRoute
   '/_app/withdrawals': typeof AppWithdrawalsRoute
   '/invoice/$saleId': typeof InvoiceSaleIdRoute
 }
@@ -210,8 +246,10 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/cash-drawer'
+    | '/categories'
     | '/customers'
     | '/dashboard'
+    | '/data'
     | '/edit-log'
     | '/employees'
     | '/expenses'
@@ -222,9 +260,11 @@ export interface FileRouteTypes {
     | '/purchases'
     | '/rebuild'
     | '/reports'
+    | '/sales'
     | '/settings'
     | '/stock-movements'
     | '/suppliers'
+    | '/user-guide'
     | '/withdrawals'
     | '/invoice/$saleId'
   fileRoutesByTo: FileRoutesByTo
@@ -232,8 +272,10 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/cash-drawer'
+    | '/categories'
     | '/customers'
     | '/dashboard'
+    | '/data'
     | '/edit-log'
     | '/employees'
     | '/expenses'
@@ -244,9 +286,11 @@ export interface FileRouteTypes {
     | '/purchases'
     | '/rebuild'
     | '/reports'
+    | '/sales'
     | '/settings'
     | '/stock-movements'
     | '/suppliers'
+    | '/user-guide'
     | '/withdrawals'
     | '/invoice/$saleId'
   id:
@@ -255,8 +299,10 @@ export interface FileRouteTypes {
     | '/_app'
     | '/login'
     | '/_app/cash-drawer'
+    | '/_app/categories'
     | '/_app/customers'
     | '/_app/dashboard'
+    | '/_app/data'
     | '/_app/edit-log'
     | '/_app/employees'
     | '/_app/expenses'
@@ -267,9 +313,11 @@ export interface FileRouteTypes {
     | '/_app/purchases'
     | '/_app/rebuild'
     | '/_app/reports'
+    | '/_app/sales'
     | '/_app/settings'
     | '/_app/stock-movements'
     | '/_app/suppliers'
+    | '/_app/user-guide'
     | '/_app/withdrawals'
     | '/invoice/$saleId'
   fileRoutesById: FileRoutesById
@@ -318,6 +366,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWithdrawalsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/user-guide': {
+      id: '/_app/user-guide'
+      path: '/user-guide'
+      fullPath: '/user-guide'
+      preLoaderRoute: typeof AppUserGuideRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/suppliers': {
       id: '/_app/suppliers'
       path: '/suppliers'
@@ -337,6 +392,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales': {
+      id: '/_app/sales'
+      path: '/sales'
+      fullPath: '/sales'
+      preLoaderRoute: typeof AppSalesRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/reports': {
@@ -409,6 +471,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEditLogRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/data': {
+      id: '/_app/data'
+      path: '/data'
+      fullPath: '/data'
+      preLoaderRoute: typeof AppDataRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -423,6 +492,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCustomersRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/categories': {
+      id: '/_app/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof AppCategoriesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/cash-drawer': {
       id: '/_app/cash-drawer'
       path: '/cash-drawer'
@@ -435,8 +511,10 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppCashDrawerRoute: typeof AppCashDrawerRoute
+  AppCategoriesRoute: typeof AppCategoriesRoute
   AppCustomersRoute: typeof AppCustomersRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppDataRoute: typeof AppDataRoute
   AppEditLogRoute: typeof AppEditLogRoute
   AppEmployeesRoute: typeof AppEmployeesRoute
   AppExpensesRoute: typeof AppExpensesRoute
@@ -447,16 +525,20 @@ interface AppRouteChildren {
   AppPurchasesRoute: typeof AppPurchasesRoute
   AppRebuildRoute: typeof AppRebuildRoute
   AppReportsRoute: typeof AppReportsRoute
+  AppSalesRoute: typeof AppSalesRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppStockMovementsRoute: typeof AppStockMovementsRoute
   AppSuppliersRoute: typeof AppSuppliersRoute
+  AppUserGuideRoute: typeof AppUserGuideRoute
   AppWithdrawalsRoute: typeof AppWithdrawalsRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppCashDrawerRoute: AppCashDrawerRoute,
+  AppCategoriesRoute: AppCategoriesRoute,
   AppCustomersRoute: AppCustomersRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppDataRoute: AppDataRoute,
   AppEditLogRoute: AppEditLogRoute,
   AppEmployeesRoute: AppEmployeesRoute,
   AppExpensesRoute: AppExpensesRoute,
@@ -467,9 +549,11 @@ const AppRouteChildren: AppRouteChildren = {
   AppPurchasesRoute: AppPurchasesRoute,
   AppRebuildRoute: AppRebuildRoute,
   AppReportsRoute: AppReportsRoute,
+  AppSalesRoute: AppSalesRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppStockMovementsRoute: AppStockMovementsRoute,
   AppSuppliersRoute: AppSuppliersRoute,
+  AppUserGuideRoute: AppUserGuideRoute,
   AppWithdrawalsRoute: AppWithdrawalsRoute,
 }
 
@@ -484,12 +568,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
