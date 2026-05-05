@@ -64,6 +64,7 @@ export function AppSidebar() {
     { to: "/customers", icon: Users, label: t("nav.customers") },
     { to: "/expenses", icon: Receipt, label: t("nav.expenses") },
     { to: "/cash-drawer", icon: Wallet, label: t("nav.cashDrawer") },
+    { to: "/user-guide", icon: BookOpen, label: "دليل المستخدم" },
   ];
 
   const admin = [
@@ -75,7 +76,6 @@ export function AppSidebar() {
     { to: "/rebuild", icon: Wrench, label: t("nav.rebuild") },
     { to: "/data", icon: Database, label: "البيانات" },
     { to: "/settings", icon: Settings, label: t("nav.settings") },
-    { to: "/user-guide", icon: BookOpen, label: "دليل المستخدم" },
   ];
 
   const renderItems = (items: Array<{ to: string; icon: React.ComponentType<{ className?: string }>; label: string; adminOnly?: boolean }>) =>
